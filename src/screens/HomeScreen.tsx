@@ -12,12 +12,87 @@ import { getDocente, removeDocente } from '../utils/session';
 import { BackHandler } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import { BleManager } from 'react-native-ble-plx';
+import { PermissionsAndroid, Platform } from 'react-native';
+import { useBLE } from '../context/BLEContext';
 
+export async function requestBluetoothPermissions() {
+  if (Platform.OS === 'android') {
+    if (Platform.Version >= 28) {
+      await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      ]);
+    } else {
+      await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      );
+    }
+  }
+}
 
 export default function HomeScreen() {
   const navigation: any = useNavigation();
   const [connected, setConnected] = useState(false);
   const [docente, setDocente] = useState<any>(null);
+  const manager = new BleManager();
+  const [isScanning, setIsScanning] = useState(false);
+  const { setDevice } = useBLE();
+
+  const connectESP32 = async () => {
+    if (isScanning) return; // ⛔ evita duplicados
+
+    setIsScanning(true);
+
+    try {
+      await requestBluetoothPermissions();
+
+      const state = await manager.state();
+      if (state !== 'PoweredOn') {
+        console.log('Bluetooth apagado');
+        setIsScanning(false);
+        return;
+      }
+
+      manager.startDeviceScan(null, null, (error, device) => {
+        if (error) {
+          console.log('SCAN ERROR:', error);
+          setIsScanning(false);
+          return;
+        }
+
+        if (device?.name === 'ESP32_AULA') {
+          console.log('ESP32 encontrado');
+
+          manager.stopDeviceScan();
+          setIsScanning(false);
+
+          device.connect()
+            .then(d => d.discoverAllServicesAndCharacteristics())
+            .then(() => {
+              console.log('Conectado!');
+              setConnected(true);
+              setDevice(device); // ✅ Guardamos el BLE device en el context
+            })
+            .catch(err => {
+              console.log('CONNECT ERROR:', err);
+              setIsScanning(false);
+            });
+        }
+      });
+
+      // ⏱️ seguridad: detener scan a los 10s
+      setTimeout(() => {
+        manager.stopDeviceScan();
+        setIsScanning(false);
+      }, 10000);
+
+    } catch (e) {
+      console.log(e);
+      setIsScanning(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -107,11 +182,17 @@ export default function HomeScreen() {
           style={[
             styles.disconnect,
             { backgroundColor: connected ? '#4CAF50' : '#FF6B6B' },
+            isScanning && { opacity: 0.6 }
           ]}
-          onPress={() => setConnected(!connected)}
+          disabled={isScanning}
+          onPress={connectESP32}
         >
           <Text style={styles.disconnectText}>
-            {connected ? 'Dispositivo Conectado' : 'Conectar con Dispositivo'}
+            {isScanning
+              ? 'Buscando dispositivo...'
+              : connected
+              ? 'Dispositivo Conectado'
+              : 'Conectar con Dispositivo'}
           </Text>
         </TouchableOpacity>
 

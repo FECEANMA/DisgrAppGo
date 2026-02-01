@@ -11,6 +11,7 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
 import { MaterialIcons } from '@expo/vector-icons'; 
+import { useBLE } from '../context/BLEContext';
 
 export default function GameScreen() {
   const route = useRoute<any>();
@@ -23,6 +24,37 @@ export default function GameScreen() {
   const [started, setStarted] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const isPracticeLoaded = !!typePractice;
+  const { device } = useBLE();
+
+  const sendToESP32 = async (text: string) => {
+    if (!device) return;
+
+    try {
+      const services = await device.services();
+      for (const service of services) {
+        if (service.uuid === "12345678-1234-1234-1234-1234567890ab") {
+          const characteristics = await service.characteristics();
+          for (const c of characteristics) {
+            if (c.uuid === "abcd1234-5678-90ab-cdef-1234567890ab") {
+              // React Native no tiene Buffer, usamos btoa
+              const base64Text = btoa(unescape(encodeURIComponent(text)));
+              await c.writeWithResponse(base64Text);
+              console.log('Texto enviado:', text);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.log('Error enviando a ESP32:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (typePractice) {
+      const texto = typePractice.caracter || typePractice.texto;
+      sendToESP32(texto);
+    }
+  }, [typePractice]);
 
   useEffect(() => {
     const loadIdsAndFirstPractice = async () => {

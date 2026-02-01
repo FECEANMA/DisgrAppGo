@@ -14,6 +14,7 @@ import GameScreen from "./src/screens/GameScreen";
 import { getDocente } from "./src/utils/session";
 import EditStudentScreen from "./src/screens/EditStudentScreen";
 import ChooseStudentGameScreen from "./src/screens/ChooseStudentGameScreen";
+import { BLEProvider } from './src/context/BLEContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ export default function App() {
   }, []);
 
   return (
+    <BLEProvider>
     <NavigationContainer>
       <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Register" component={RegisterTeacherScreen} />
@@ -45,5 +47,6 @@ export default function App() {
         <Stack.Screen name="ChooseStudentGame" component={ChooseStudentGameScreen} />
       </Stack.Navigator>
     </NavigationContainer>
+    </BLEProvider>
   );
 }
