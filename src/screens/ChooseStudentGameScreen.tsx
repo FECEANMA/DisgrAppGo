@@ -10,6 +10,7 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  TextInput
 } from 'react-native';
 import { API_BASE_URL } from '../config';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +23,7 @@ export default function ChooseStudentGameScreen() {
 
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchStudents = async () => {
     try {
@@ -54,6 +56,10 @@ export default function ChooseStudentGameScreen() {
     );
   }
 
+  const filteredStudents = students.filter(student =>
+    `${student.nombre} ${student.apellido}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <ImageBackground
       source={require('../../assets/login.png')}
@@ -66,8 +72,14 @@ export default function ChooseStudentGameScreen() {
       </TouchableOpacity>
 
       <View style={styles.container}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar estudiante..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
         <FlatList
-          data={students}
+          data={filteredStudents}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -132,5 +144,15 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
+  },
+  searchInput: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginBottom: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });

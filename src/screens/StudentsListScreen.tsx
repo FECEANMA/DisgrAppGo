@@ -11,6 +11,7 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  TextInput
 } from 'react-native';
 import { API_BASE_URL } from "../config";
 import { useFocusEffect } from '@react-navigation/native';
@@ -23,6 +24,7 @@ export default function StudentsListScreen() {
 
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const deleteStudent = async (id: number) => {
     try {
@@ -85,6 +87,10 @@ export default function StudentsListScreen() {
     );
   }
 
+  const filteredStudents = students.filter(student =>
+    `${student.nombre} ${student.apellido}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <ImageBackground
       source={require('../../assets/login.png')}
@@ -106,8 +112,15 @@ export default function StudentsListScreen() {
           <Text style={styles.newText}>+ Nuevo Alumno</Text>
         </TouchableOpacity>
 
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar estudiante..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+
         <FlatList
-          data={students}
+          data={filteredStudents}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.card}>
@@ -202,5 +215,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF4C4C',
     padding: 8,
     borderRadius: 50,
+  },
+  searchInput: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginBottom: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
   },
 });
