@@ -1,10 +1,12 @@
 //src/screens/GameLevelScreen.tsx
 import React from 'react';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { ImageBackground, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 
 export default function GameLevelScreen() {
     const navigation: any = useNavigation();
+    const route: any = useRoute();
+    const { docenteDetail } = route.params;
 
     return (
         <ImageBackground
@@ -31,15 +33,15 @@ export default function GameLevelScreen() {
                 <Text style={styles.title}>Selecciona tu nivel</Text>
 
                 {/* Botones de niveles */}
-                <TouchableOpacity style={[styles.button, styles.level1]} onPress={() => navigation.navigate('Game')}>
+                <TouchableOpacity style={[styles.button, styles.level1]} onPress={() => navigation.navigate('ChooseStudentLevelGame', { docenteDetail: docenteDetail, levelId: 1})}>
                     <Text style={styles.buttonText}>Nivel 1 🟢</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, styles.level2]} onPress={() => navigation.navigate('Game')}>
+                <TouchableOpacity style={[styles.button, styles.level2]} onPress={() => navigation.navigate('ChooseStudentLevelGame', { docenteDetail: docenteDetail, levelId: 2 })}>
                     <Text style={styles.buttonText}>Nivel 2 🟡</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, styles.level3]} onPress={() => navigation.navigate('Game')}>
+                <TouchableOpacity style={[styles.button, styles.level3]} onPress={() => navigation.navigate('ChooseStudentLevelGame', { docenteDetail: docenteDetail, levelId: 3 })}>
                     <Text style={styles.buttonText}>Nivel 3 🔴</Text>
                 </TouchableOpacity>
             </View>

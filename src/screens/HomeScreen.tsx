@@ -190,7 +190,7 @@ export default function HomeScreen() {
         <TouchableOpacity
           style={[styles.button, !connected && styles.buttonDisabled]}
           disabled={!connected}
-          onPress={() => navigation.navigate('GameLevel')}
+          onPress={() => navigation.navigate('GameLevel', { docenteDetail: docente })}
         >
           <Text style={styles.buttonText}>Niveles</Text>
         </TouchableOpacity>

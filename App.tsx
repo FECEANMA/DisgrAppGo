@@ -15,6 +15,8 @@ import { getDocente } from "./src/utils/session";
 import EditStudentScreen from "./src/screens/EditStudentScreen";
 import ChooseStudentGameScreen from "./src/screens/ChooseStudentGameScreen";
 import { BLEProvider } from './src/context/BLEContext';
+import StudentLevelGameScreen from "./src/screens/StudentLevelGameScreen";
+import GameLevelScreen1 from "./src/screens/GameLevelScreen1";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,10 +43,12 @@ export default function App() {
         <Stack.Screen name="TypeGame" component={TypeGameScreen} />
         <Stack.Screen name="OrderGame" component={OrderGameScreen} />
         <Stack.Screen name="GameLevel" component={GameLevelScreen} />
+        <Stack.Screen name="GameLevel1" component={GameLevelScreen1} />
         <Stack.Screen name="ProfileStudent" component={ProfileStudentScreen} />
         <Stack.Screen name="Game" component={GameScreen} />
         <Stack.Screen name="EditStudentScreen" component={EditStudentScreen} />
         <Stack.Screen name="ChooseStudentGame" component={ChooseStudentGameScreen} />
+        <Stack.Screen name="ChooseStudentLevelGame" component={StudentLevelGameScreen} />
       </Stack.Navigator>
     </NavigationContainer>
     </BLEProvider>
