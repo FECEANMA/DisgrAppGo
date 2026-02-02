@@ -38,7 +38,24 @@ export default function HomeScreen() {
   const [docente, setDocente] = useState<any>(null);
   const manager = new BleManager();
   const [isScanning, setIsScanning] = useState(false);
-  const { setDevice } = useBLE();
+  const { device, setDevice } = useBLE(); // usamos device del context
+
+  const handleDeviceToggle = async () => {
+    if (device && connected) {
+      // 🔹 Si ya está conectado, desconectamos
+      try {
+        await device.cancelConnection();
+        console.log('Desconectado!');
+        setConnected(false);
+        setDevice(null); // limpiamos el device del context
+      } catch (err) {
+        console.log('ERROR al desconectar:', err);
+      }
+    } else {
+      // 🔹 Si no está conectado, conectamos
+      connectESP32();
+    }
+  };
 
   const connectESP32 = async () => {
     if (isScanning) return; // ⛔ evita duplicados
@@ -185,7 +202,7 @@ export default function HomeScreen() {
             isScanning && { opacity: 0.6 }
           ]}
           disabled={isScanning}
-          onPress={connectESP32}
+          onPress={handleDeviceToggle} // 🔹 usamos toggle
         >
           <Text style={styles.disconnectText}>
             {isScanning
