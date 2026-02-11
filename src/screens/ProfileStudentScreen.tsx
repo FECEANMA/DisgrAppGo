@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image,   ImageBackground,   TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
+import ScreenWrapper from '../components/ScreenWrapper';
 
 export default function ProfileStudentScreen() {
   const route: any = useRoute();
@@ -27,12 +28,8 @@ export default function ProfileStudentScreen() {
   );
 
   return (
-    <ImageBackground
-      source={require("../../assets/login.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-    <View style={styles.blueOverlay} />
+    <ScreenWrapper>
+
     {/* Botón Home */}
     <TouchableOpacity
       style={styles.home}
@@ -99,17 +96,10 @@ export default function ProfileStudentScreen() {
         </View>
       </View>
     </View>
-  </ImageBackground>
+  </ScreenWrapper>
   );
 }
 const styles = StyleSheet.create({
-    blueOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 80, 180, 0.25)",
-  },
-    background: {
-    flex: 1,
-  },
   home: {
     position: 'absolute',
     top: 40,

@@ -14,6 +14,7 @@ import { saveDocente } from '../utils/session';
 import { API_BASE_URL } from "../config";
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import ScreenWrapper from "../components/ScreenWrapper";
 
 
 const LoginScreen: React.FC = () => {
@@ -62,12 +63,7 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/login.png')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-  <View style={styles.blueOverlay} />
+    <ScreenWrapper>
 
     <View style={styles.container}>
       {/* LOGO */}
@@ -115,7 +111,7 @@ const LoginScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
     </View>
-    </ImageBackground>
+    </ScreenWrapper>
   );
 };
 

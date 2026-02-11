@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { API_BASE_URL } from "../config";
+import ScreenWrapper from '../components/ScreenWrapper';
 
 export default function AddStudentScreen() {
   const navigation: any = useNavigation();
@@ -61,12 +62,7 @@ export default function AddStudentScreen() {
   }
 
   return (
-    <ImageBackground
-      source={require('../../assets/login.png')}
-      style={styles.background}
-    >
-    <View style={styles.blueOverlay} />
-
+    <ScreenWrapper>
       {/* Botón Home */}
       <TouchableOpacity
         style={styles.home}
@@ -117,22 +113,15 @@ export default function AddStudentScreen() {
           <Text style={styles.saveText}>Guardar</Text>
         </TouchableOpacity>
       </View>
-    </ImageBackground>
+    </ScreenWrapper>
   );
 }
 const styles = StyleSheet.create({
-  blueOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 80, 180, 0.25)",
-  },
   home: {
     position: 'absolute',
     top: 40,
     left: 20,
     zIndex: 1,
-  },
-  background: {
-    flex: 1,
   },
   settings: {
     position: 'absolute',

@@ -235,9 +235,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  blueOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0, 80, 180, 0.25)' },
-  background: { flex: 1 },
-  home: { position: 'absolute', top: 40, left: 20, zIndex: 1 },
   settings: { position: 'absolute', top: 40, right: 20 },
   container: { flex: 1, justifyContent: 'center', paddingHorizontal: 30 },
   card: { backgroundColor: '#E0E0E0', borderRadius: 20, alignItems: 'center', padding: 20, marginBottom: 30 },

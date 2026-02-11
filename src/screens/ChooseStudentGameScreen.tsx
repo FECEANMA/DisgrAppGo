@@ -15,6 +15,7 @@ import {
 import { API_BASE_URL } from '../config';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
+import ScreenWrapper from '../components/ScreenWrapper';
 
 export default function ChooseStudentGameScreen() {
   const navigation: any = useNavigation();
@@ -61,12 +62,7 @@ export default function ChooseStudentGameScreen() {
   );
 
   return (
-    <ImageBackground
-      source={require('../../assets/login.png')}
-      style={styles.background}
-    >
-      <View style={styles.blueOverlay} />
-      
+    <ScreenWrapper>      
       <TouchableOpacity style={styles.home} onPress={() => navigation.goBack()}>
         <Text style={{ fontSize: 24 }}>🏠</Text>
       </TouchableOpacity>
@@ -100,18 +96,11 @@ export default function ChooseStudentGameScreen() {
           )}
         />
       </View>
-    </ImageBackground>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  blueOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 80, 180, 0.25)',
-  },
-  background: {
-    flex: 1,
-  },
   home: {
     position: 'absolute',
     top: 40,

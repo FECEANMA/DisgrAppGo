@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ImageBackground, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import ScreenWrapper from '../components/ScreenWrapper';
 
 export default function GameLevelScreen() {
     const navigation: any = useNavigation();
@@ -9,12 +10,7 @@ export default function GameLevelScreen() {
     const { docenteDetail } = route.params;
 
     return (
-        <ImageBackground
-            source={require('../../assets/login.png')}
-            style={styles.background}
-        >
-            <View style={styles.blueOverlay} />
-
+        <ScreenWrapper>
             {/* Botón Home */}
             <TouchableOpacity
                 style={styles.home}
@@ -45,18 +41,11 @@ export default function GameLevelScreen() {
                     <Text style={styles.buttonText}>Nivel 3 🔴</Text>
                 </TouchableOpacity>
             </View>
-        </ImageBackground>
+        </ScreenWrapper>
     );
 }
 
 const styles = StyleSheet.create({
-    background: {
-        flex: 1,
-    },
-    blueOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0, 80, 180, 0.25)",
-    },
     home: {
         position: 'absolute',
         top: 40,

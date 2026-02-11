@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
+import ScreenWrapper from '../components/ScreenWrapper';
 
 export default function EditStudentScreen() {
   const route: any = useRoute();
@@ -66,13 +67,7 @@ const handlerEditStudent = async () => {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/login.png')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.blueOverlay} />
-
+    <ScreenWrapper>
       <TouchableOpacity style={styles.home} onPress={() => navigation.goBack()}>
         <Text style={{ fontSize: 24 }}>⬅️</Text>
       </TouchableOpacity>
@@ -116,18 +111,11 @@ const handlerEditStudent = async () => {
           </TouchableOpacity>
         </View>
       </View>
-    </ImageBackground>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  blueOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 80, 180, 0.25)',
-  },
-  background: {
-    flex: 1,
-  },
   home: {
     position: 'absolute',
     top: 40,

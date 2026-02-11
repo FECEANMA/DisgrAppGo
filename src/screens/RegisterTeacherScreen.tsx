@@ -13,6 +13,7 @@ import {
   FlatList,
 } from "react-native";
 import { API_BASE_URL } from "../config";
+import ScreenWrapper from "../components/ScreenWrapper";
 
 interface Aula {
   id: number;
@@ -83,12 +84,7 @@ const RegisterTeacherScreen: React.FC = () => {
   };
 
   return (
-    <ImageBackground
-      source={require("../../assets/login.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.blueOverlay} />
+    <ScreenWrapper>
 
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.logoContainer}>
@@ -168,7 +164,7 @@ const RegisterTeacherScreen: React.FC = () => {
           <Text style={styles.backText}>¿Ya tienes cuenta? Inicia sesión</Text>
         </TouchableOpacity>
       </ScrollView>
-    </ImageBackground>
+    </ScreenWrapper>
   );
 };
 
