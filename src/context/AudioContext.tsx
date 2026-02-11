@@ -13,7 +13,7 @@ const AudioContext = createContext<AudioContextProps | null>(null);
 export const AudioProvider = ({ children }: any) => {
   const soundRef = useRef<Audio.Sound | null>(null);
 
-  const [musicEnabled, setMusicEnabled] = useState(false);
+  const [musicEnabled, setMusicEnabled] = useState(true);
   const [musicVolume, setMusicVolume] = useState(0.1);
 
   // 🎵 Cargar música
