@@ -12,6 +12,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { useBLE } from '../context/BLEContext';
+import { ResizeMode, Video } from 'expo-av';
 
 export default function GameScreen() {
   const route = useRoute<any>();
@@ -213,7 +214,7 @@ export default function GameScreen() {
       <View style={styles.centerIcon}>
         {typePractice?.imageUrl ? (
           <Image
-            source={{ uri: typePractice.imageUrl }}
+            source={{ uri: API_BASE_URL + typePractice.imageUrl }}
             style={styles.practiceImage}
             resizeMode="contain"
           />
@@ -228,10 +229,22 @@ export default function GameScreen() {
         </Text>
       </View>
 
-      {/* Botón Play */}
-      <TouchableOpacity style={styles.playButton}>
-        <Text style={styles.playIcon}>▶</Text>
-      </TouchableOpacity>
+      {/* Video */}
+      <View style={styles.videoContainer}>
+        {typePractice?.videoUrl ? (
+          <Video
+            source={{ uri: API_BASE_URL + typePractice.videoUrl }}
+            style={styles.video}
+            useNativeControls
+            resizeMode={ResizeMode.CONTAIN}
+            isLooping
+          />
+        ) : (
+          <View style={styles.playButton}>
+            <Text style={styles.playIcon}>▶</Text>
+          </View>
+        )}
+      </View>
 
       {/* Botón iniciar */}
       <TouchableOpacity
@@ -346,5 +359,19 @@ const styles = StyleSheet.create({
   startButtonDisabled: {
     backgroundColor: '#999',
     opacity: 0.6,
+  },
+  videoContainer: {
+    marginTop: 40,
+    width: 260,
+    height: 160,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
   },
 });

@@ -15,6 +15,7 @@ import { useCallback } from 'react';
 import { BleManager } from 'react-native-ble-plx';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { useBLE } from '../context/BLEContext';
+import ScreenWrapper from '../components/ScreenWrapper';
 
 export async function requestBluetoothPermissions() {
   if (Platform.OS === 'android') {
@@ -138,23 +139,31 @@ export default function HomeScreen() {
   }, []);
 
   const handleLogout = async () => {
-    await removeDocente();
+    try {
+      // 🔹 Si hay dispositivo conectado, lo desconectamos
+      if (device) {
+        await device.cancelConnection();
+        console.log('Dispositivo desconectado al cerrar sesión');
+        setConnected(false);
+        setDevice(null);
+      }
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+      await removeDocente();
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+
+    } catch (error) {
+      console.log('Error al cerrar sesión:', error);
+    }
   };
 
   if (!docente) return null;
 
   return (
-    <ImageBackground
-      source={require('../../assets/login.png')}
-      style={styles.background}
-    >
-      <View style={styles.blueOverlay} />
-
+    <ScreenWrapper>
       {/* Icono ajustes */}
       <TouchableOpacity style={styles.settings}>
         <Text style={{ fontSize: 20 }}>⚙️</Text>
@@ -221,7 +230,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
       </View>
-    </ImageBackground>
+    </ScreenWrapper>
   );
 }
 

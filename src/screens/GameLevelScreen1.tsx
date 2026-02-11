@@ -12,6 +12,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { useBLE } from '../context/BLEContext';
+import { ResizeMode, Video } from 'expo-av';
 
 export default function GameLevelScreen1() {
   const route = useRoute<any>();
@@ -217,7 +218,7 @@ const handleStartNext = async () => {
 
       <View style={styles.centerIcon}>
         {typePractice?.imageUrl ? (
-          <Image source={{ uri: typePractice.imageUrl }} style={styles.practiceImage} resizeMode="contain" />
+          <Image source={{ uri: API_BASE_URL + typePractice.imageUrl }} style={styles.practiceImage} resizeMode="contain" />
         ) : (
           <MaterialIcons name="image" size={150} color="#ccc" />
         )}
@@ -227,9 +228,22 @@ const handleStartNext = async () => {
         <Text style={styles.typeText}>{typePractice?.caracter || typePractice?.texto || "Cargando"}</Text>
       </View>
 
-      <TouchableOpacity style={styles.playButton}>
-        <Text style={styles.playIcon}>▶</Text>
-      </TouchableOpacity>
+      {/* Video */}
+      <View style={styles.videoContainer}>
+        {typePractice?.videoUrl ? (
+          <Video
+            source={{ uri: API_BASE_URL + typePractice.videoUrl }}
+            style={styles.video}
+            useNativeControls
+            resizeMode={ResizeMode.CONTAIN}
+            isLooping
+          />
+        ) : (
+          <View style={styles.playButton}>
+            <Text style={styles.playIcon}>▶</Text>
+          </View>
+        )}
+      </View>
 
       <TouchableOpacity
         style={[styles.startButton, !isPracticeLoaded && styles.startButtonDisabled]}
@@ -265,4 +279,18 @@ const styles = StyleSheet.create({
   startText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   practiceImage: { width: 200, height: 200, borderRadius: 20 },
   startButtonDisabled: { backgroundColor: '#999', opacity: 0.6 },
+  videoContainer: {
+    marginTop: 40,
+    width: 260,
+    height: 160,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
 });
