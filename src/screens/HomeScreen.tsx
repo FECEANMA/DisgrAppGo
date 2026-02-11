@@ -16,6 +16,7 @@ import { BleManager } from 'react-native-ble-plx';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { useBLE } from '../context/BLEContext';
 import ScreenWrapper from '../components/ScreenWrapper';
+import SettingsModal from '../components/SettingsModal';
 
 export async function requestBluetoothPermissions() {
   if (Platform.OS === 'android') {
@@ -228,6 +229,7 @@ export default function HomeScreen() {
         >
           <Text style={styles.disconnectText}>Cerrar sesión</Text>
         </TouchableOpacity>
+        <SettingsModal />
 
       </View>
     </ScreenWrapper>
