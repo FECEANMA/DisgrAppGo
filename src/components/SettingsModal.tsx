@@ -24,10 +24,10 @@ export default function SettingsModal() {
   return (
     <>
       <TouchableOpacity
-        style={styles.settingsIcon}
+        style={styles.settingsButton}
         onPress={() => setVisible(true)}
       >
-        <Text style={{ fontSize: 22 }}>⚙️</Text>
+        <Text style={styles.settingsIcon}>⚙️</Text>
       </TouchableOpacity>
 
       <Modal transparent animationType="slide" visible={visible}>
@@ -62,11 +62,13 @@ export default function SettingsModal() {
 }
 
 const styles = StyleSheet.create({
+  settingsButton: {
+    padding: 6,
+  },
+
   settingsIcon: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 10,
+    fontSize: 20,
+    color: '#FFFFFF',
   },
   overlay: {
     flex: 1,
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     marginTop: 20,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#EF4444',
     padding: 12,
     borderRadius: 15,
     alignItems: 'center',

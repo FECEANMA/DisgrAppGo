@@ -4,14 +4,15 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
   TouchableOpacity,
   TextInput,
   Alert,
+  ScrollView
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
-import ScreenWrapper from '../components/ScreenWrapper';
+import LinearGradient from 'react-native-linear-gradient';
+import SettingsModal from '../components/SettingsModal';
 
 export default function EditStudentScreen() {
   const route: any = useRoute();
@@ -67,101 +68,138 @@ const handlerEditStudent = async () => {
   };
 
   return (
-    <ScreenWrapper>
-      <TouchableOpacity style={styles.home} onPress={() => navigation.goBack()}>
-        <Text style={{ fontSize: 24 }}>⬅️</Text>
-      </TouchableOpacity>
-
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Editar Estudiante</Text>
-
-          <Text style={styles.label}>Nombre</Text>
-          <TextInput
-            style={styles.input}
-            value={nombre}
-            onChangeText={setNombre}
-          />
-
-          <Text style={styles.label}>Apellido</Text>
-          <TextInput
-            style={styles.input}
-            value={apellido}
-            onChangeText={setApellido}
-          />
-
-          <Text style={styles.label}>Edad</Text>
-          <TextInput
-            style={styles.input}
-            value={edad}
-            onChangeText={setEdad}
-            keyboardType="numeric"
-          />
-
-          <Text style={styles.label}>Dificultades Detectadas</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={observacion}
-            onChangeText={setObservacion}
-            multiline
-          />
-
-          <TouchableOpacity style={styles.saveButton} onPress={handlerEditStudent}>
-            <Text style={styles.saveText}>Guardar Cambios</Text>
+      <LinearGradient
+        colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <Text style={{ fontSize: 20 }}>⬅️</Text>
           </TouchableOpacity>
+
+          <SettingsModal />
         </View>
-      </View>
-    </ScreenWrapper>
+        
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.card}>
+            <Text style={styles.title}>Editar Estudiante</Text>
+
+            <Text style={styles.label}>Nombre</Text>
+            <TextInput
+              style={styles.input}
+              value={nombre}
+              onChangeText={setNombre}
+              placeholder="Ingresa el nombre"
+            />
+
+            <Text style={styles.label}>Apellido</Text>
+            <TextInput
+              style={styles.input}
+              value={apellido}
+              onChangeText={setApellido}
+              placeholder="Ingresa el apellido"
+            />
+
+            <Text style={styles.label}>Edad</Text>
+            <TextInput
+              style={styles.input}
+              value={edad}
+              onChangeText={setEdad}
+              keyboardType="numeric"
+              placeholder="Ej: 10"
+            />
+
+            <Text style={styles.label}>Dificultades Detectadas</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={observacion}
+              onChangeText={setObservacion}
+              multiline
+              placeholder="Observaciones sobre el estudiante"
+            />
+
+            <TouchableOpacity style={styles.saveButton} onPress={handlerEditStudent}>
+              <Text style={styles.saveText}>Guardar Cambios</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  home: {
+  backButton: {
     position: 'absolute',
     top: 40,
     left: 20,
     zIndex: 1,
   },
   container: {
-    flex: 1,
     padding: 20,
     paddingTop: 120,
   },
   card: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 20,
+    padding: 25,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 5,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
+    fontSize: 22,
+    fontWeight: '700',
     textAlign: 'center',
+    marginBottom: 20,
+    color: '#1E293B',
   },
   label: {
-    fontWeight: 'bold',
-    marginTop: 10,
+    fontWeight: '600',
+    marginTop: 15,
+    color: '#334155',
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 5,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 6,
+    fontSize: 15,
+    color: '#1E293B',
   },
   textArea: {
-    height: 80,
+    height: 100,
     textAlignVertical: 'top',
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 15,
-    padding: 15,
-    marginTop: 20,
+    marginTop: 25,
+    backgroundColor: '#2563EB',
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: 'center',
+    shadowColor: '#2563EB',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   saveText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '700',
     fontSize: 16,
+  },
+  header: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  headerButton: {
+    padding: 10,
   },
 });

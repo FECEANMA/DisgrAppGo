@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { API_BASE_URL } from "../config";
-import ScreenWrapper from '../components/ScreenWrapper';
+import LinearGradient from 'react-native-linear-gradient';
+import SettingsModal from '../components/SettingsModal';
 
 export default function AddStudentScreen() {
   const navigation: any = useNavigation();
@@ -62,81 +63,92 @@ export default function AddStudentScreen() {
   }
 
   return (
-    <ScreenWrapper>
-      {/* Botón Home */}
-      <TouchableOpacity
-        style={styles.home}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={{ fontSize: 24 }}>⬅️</Text>
-      </TouchableOpacity>
+    <LinearGradient
+      colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={{ flex: 1 }}
+    >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.headerIcon}>⬅️</Text>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Agregar Estudiante</Text>
+          <SettingsModal/>
+        </View>
 
-      {/* Icono ajustes */}
-      <TouchableOpacity style={styles.settings}>
-        <Text style={{ fontSize: 20 }}>⚙️</Text>
-      </TouchableOpacity>
-
-      <View style={styles.container}>
-        {/* Avatar */}
-        <View style={styles.avatarContainer}>
+        {/* Card de formulario */}
+        <View style={styles.card}>
+          {/* Avatar */}
           <View style={styles.avatar}>
             <Text style={styles.avatarIcon}>👤➕</Text>
           </View>
+
+          {/* Inputs */}
+          <Text style={styles.label}>Nombre</Text>
+          <TextInput
+            style={styles.input}
+            value={nombre}
+            onChangeText={setNombre}
+          />
+
+          <Text style={styles.label}>Apellido</Text>
+          <TextInput
+            style={styles.input}
+            value={apellido}
+            onChangeText={setApellido}
+          />
+
+          <Text style={styles.label}>Edad</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={edad}
+            onChangeText={(text) => setEdad(text.replace(/[^0-9]/g, ""))}
+          />
+
+          {/* Botón Guardar */}
+          <TouchableOpacity style={styles.saveButton} onPress={handlerAddStudent}>
+            <Text style={styles.saveText}>Guardar</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Inputs */}
-        <Text style={styles.label}>Nombre</Text>
-        <TextInput style={styles.input}
-          value={nombre}
-          onChangeText={setNombre} 
-        />
-
-        <Text style={styles.label}>Apellido</Text>
-          <TextInput style={styles.input} 
-          value={apellido}
-          onChangeText={setApellido}
-        />
-
-        <Text style={styles.label}>Edad</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="numeric"
-          value={edad}
-          onChangeText={(text) => {
-            const onlyNumbers = text.replace(/[^0-9]/g, "");
-            setEdad(onlyNumbers);
-          }}
-        />
-
-        {/* Botón */}
-        <TouchableOpacity onPress={handlerAddStudent} style={styles.saveButton} >
-          <Text style={styles.saveText}>Guardar</Text>
-        </TouchableOpacity>
-      </View>
-    </ScreenWrapper>
+    </LinearGradient>
   );
 }
+
 const styles = StyleSheet.create({
-  home: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 1,
-  },
-  settings: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 30,
-  },
-  avatarContainer: {
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 30,
+    marginTop: 40,
+    paddingHorizontal: 20,
+    marginBottom: 20,
   },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  headerIcon: {
+    fontSize: 20,
+    color: '#FFFFFF',
+  },
+
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    marginHorizontal: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
+    alignItems: 'center',
+    marginTop: 50
+  },
+
   avatar: {
     width: 100,
     height: 100,
@@ -144,39 +156,42 @@ const styles = StyleSheet.create({
     backgroundColor: '#D6C68E',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
   },
   avatarIcon: {
-    fontSize: 30,
+    fontSize: 32,
   },
+
   label: {
-    color: '#060000',
-    fontWeight: '600',
-    marginBottom: 6,
-    width: '75%',
-    alignSelf: 'center',
     fontSize: 14,
+    fontWeight: '600',
+    color: '#334155',
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+    marginLeft: 10,
   },
   input: {
-    backgroundColor: 'rgba(120,120,120,0.9)',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    color: '#fff',
-    marginBottom: 15,
-    width: '75%',
-    alignSelf: 'center'
-  },
-  saveButton: {
-    backgroundColor: '#7CFF6B',
+    width: '100%',
+    backgroundColor: '#F1F5F9',
+    borderRadius: 14,
     paddingVertical: 12,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginTop: 20,
+    paddingHorizontal: 16,
+    fontSize: 14,
+    color: '#1E293B',
+    marginBottom: 15,
+  },
+
+  saveButton: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 14,
+    borderRadius: 14,
     width: '60%',
-    alignSelf: 'center'
+    alignItems: 'center',
+    marginTop: 10,
   },
   saveText: {
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '600',
     fontSize: 16,
   },
 });

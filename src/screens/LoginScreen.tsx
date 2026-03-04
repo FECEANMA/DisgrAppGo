@@ -14,7 +14,7 @@ import { saveDocente } from '../utils/session';
 import { API_BASE_URL } from "../config";
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
-import ScreenWrapper from "../components/ScreenWrapper";
+import LinearGradient from 'react-native-linear-gradient';
 
 
 const LoginScreen: React.FC = () => {
@@ -63,133 +63,114 @@ const LoginScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper>
+      <LinearGradient
+        colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.container}
+      >
+        {/* LOGO */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../assets/logo.jpg')}
+            style={styles.logo}
+          />
+          <Text style={styles.logoText}>DigrAppGo!</Text>
+        </View>
 
-    <View style={styles.container}>
-      {/* LOGO */}
-      <View style={styles.logoContainer}>
-        <Image
-        source={require('../../assets/logo.jpg')}
-        style={styles.logo}
-        />
-        <Text style={styles.logoText}>DigrAppGo!</Text>
-      </View>
+        {/* TARJETA LOGIN */}
+        <View style={styles.card}>
+          <TextInput
+            style={styles.input}
+            placeholder="Correo institucional"
+            placeholderTextColor="#94A3B8"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-      {/* INPUTS */}
-      <TextInput
-        style={styles.input}
-        placeholder="Correo institucional"
-        placeholderTextColor="#fff"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            placeholderTextColor="#94A3B8"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        placeholderTextColor="#fff"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginText}>Iniciar sesión</Text>
+          </TouchableOpacity>
 
-      {/* BOTÓN */}
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginText}>Iniciar sesión</Text>
-      </TouchableOpacity>
-
-      {/* OLVIDASTE CONTRASEÑA */}
-      <TouchableOpacity onPress={handleForgotPassword} style={styles.forgotButton}>
-        <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
-      {/* REGISTRARSE */}
-      <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
-        <Text style={styles.registerText}>
-          ¿No tienes cuenta? Regístrate
-        </Text>
-      </TouchableOpacity>
-    </View>
-    </ScreenWrapper>
+          <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+            <Text style={styles.registerText}>¿No tienes cuenta? Regístrate</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
   );
 };
 
 export default LoginScreen;
 
 const styles = StyleSheet.create({
-  blueOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 80, 180, 0.25)',
-  },
-  background: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 30,
+    paddingHorizontal: 24,
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 40,
   },
   logo: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     backgroundColor: '#fff',
   },
   logoText: {
     marginTop: 10,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 5,
   },
   input: {
-    backgroundColor: 'rgba(120,120,120,0.9)',
-    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 12,
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    color: '#fff',
+    paddingHorizontal: 16,
+    color: '#1E293B',
     marginBottom: 15,
-    width: '90%',
-    alignSelf:'center'
   },
   loginButton: {
-    backgroundColor: '#6EEB83',
-    paddingVertical: 12,
-    borderRadius: 20,
+    backgroundColor: '#2563EB',
+    paddingVertical: 14,
+    borderRadius: 14,
     alignItems: 'center',
     marginTop: 10,
-    width: '60%',
-    alignSelf: 'center'
   },
   loginText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '700',
     fontSize: 16,
   },
-  forgotButton: {
-    backgroundColor: '#FF6B6B',
-    paddingVertical: 10,
-    borderRadius: 20,
-    alignItems: 'center',
-    marginTop: 15,
-    width: '60%',
-    alignSelf: 'center'
-  },
-  forgotText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
   registerButton: {
-    marginTop: 20,
+    marginTop: 12,
     alignItems: 'center',
   },
   registerText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#2563EB',
+    fontWeight: '600',
     textDecorationLine: 'underline',
   },
 });

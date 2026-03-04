@@ -13,7 +13,7 @@ import {
   FlatList,
 } from "react-native";
 import { API_BASE_URL } from "../config";
-import ScreenWrapper from "../components/ScreenWrapper";
+import LinearGradient from 'react-native-linear-gradient';
 
 interface Aula {
   id: number;
@@ -84,179 +84,150 @@ const RegisterTeacherScreen: React.FC = () => {
   };
 
   return (
-    <ScreenWrapper>
+      <LinearGradient
+        colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.container}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* LOGO */}
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/logo.jpg")}
+              style={styles.logo}
+            />
+            <Text style={styles.logoText}>DigrAppGo!</Text>
+            <Text style={styles.subtitle}>Registro de Profesor</Text>
+          </View>
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/logo.jpg")}
-            style={styles.logo}
-          />
-          <Text style={styles.logoText}>DigrAppGo!</Text>
-          <Text style={styles.subtitle}>Registro de Profesor</Text>
-        </View>
+          {/* TARJETA FORM */}
+          <View style={styles.card}>
+            <TextInput
+              style={styles.input}
+              placeholder="Nombres"
+              placeholderTextColor="#94A3B8"
+              value={nombre}
+              onChangeText={setNombre}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Apellidos"
+              placeholderTextColor="#94A3B8"
+              value={apellido}
+              onChangeText={setApellido}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Correo institucional"
+              placeholderTextColor="#94A3B8"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              placeholderTextColor="#94A3B8"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Nombres"
-          placeholderTextColor="#fff"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Apellidos"
-          placeholderTextColor="#fff"
-          value={apellido}
-          onChangeText={setApellido}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Correo institucional"
-          placeholderTextColor="#fff"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          placeholderTextColor="#fff"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+            <Text style={styles.label}>Selecciona un aula:</Text>
+            <FlatList
+              horizontal
+              data={aulas}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.aulasContainer}
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.aulaButton,
+                    aulaId === item.id && styles.aulaButtonSelected,
+                  ]}
+                  onPress={() => setAulaId(item.id)}
+                >
+                  <Text
+                    style={[
+                      styles.aulaText,
+                      aulaId === item.id && styles.aulaTextSelected,
+                    ]}
+                  >
+                    {item.nombre}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
 
-        {/* Selección de aulas horizontal */}
-        <Text style={styles.label}>Selecciona un aula:</Text>
-        <FlatList
-          horizontal
-          data={aulas}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.aulasContainer}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.aulaButton,
-                aulaId === item.id && styles.aulaButtonSelected,
-              ]}
-              onPress={() => setAulaId(item.id)}
-            >
-              <Text
-                style={[
-                  styles.aulaText,
-                  aulaId === item.id && styles.aulaTextSelected,
-                ]}
-              >
-                {item.nombre}
-              </Text>
+            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+              <Text style={styles.registerText}>Registrarse</Text>
             </TouchableOpacity>
-          )}
-        />
 
-        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-          <Text style={styles.registerText}>Registrarse</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>¿Ya tienes cuenta? Inicia sesión</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </ScreenWrapper>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Text style={styles.backText}>¿Ya tienes cuenta? Inicia sesión</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </LinearGradient>
   );
 };
 
 export default RegisterTeacherScreen;
 
 const styles = StyleSheet.create({
-  blueOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 80, 180, 0.25)",
-  },
-  background: {
-    flex: 1,
-  },
-  container: {
-    padding: 30,
-    alignItems: "center",
-    paddingTop: 120,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  logo: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    backgroundColor: "#fff",
-  },
-  logoText: {
-    marginTop: 10,
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  subtitle: {
-    marginTop: 5,
-    fontSize: 16,
-    color: "#000",
+  container: { flex: 1 },
+  scrollContainer: { paddingHorizontal: 24, paddingTop: 60, alignItems: 'center' },
+  logoContainer: { alignItems: 'center', marginBottom: 30 },
+  logo: { width: 120, height: 120, borderRadius: 60, backgroundColor: '#fff' },
+  logoText: { marginTop: 10, fontSize: 24, fontWeight: '700', color: '#FFFFFF' },
+  subtitle: { marginTop: 5, fontSize: 16, color: '#FFFFFF' },
+  card: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 5,
+    marginBottom: 40,
   },
   input: {
-    backgroundColor: "rgba(120,120,120,0.9)",
-    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 12,
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    color: "#fff",
+    paddingHorizontal: 16,
+    color: '#1E293B',
     marginBottom: 15,
-    width: "90%",
   },
   label: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#1E293B',
+    fontWeight: '600',
     marginBottom: 10,
-    alignSelf: "flex-start",
-    marginLeft: "5%",
   },
-  aulasContainer: {
-    paddingHorizontal: 5,
-    marginBottom: 15,
-  },
+  aulasContainer: { paddingHorizontal: 5, marginBottom: 15 },
   aulaButton: {
-    backgroundColor: "rgba(100,100,100,0.8)",
+    backgroundColor: '#E2E8F0',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 25,
     marginHorizontal: 5,
   },
   aulaButtonSelected: {
-    backgroundColor: "#f3dc0d",
+    backgroundColor: '#2563EB',
   },
-  aulaText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  aulaTextSelected: {
-    color: "#000",
-  },
+  aulaText: { color: '#1E293B', fontWeight: '600' },
+  aulaTextSelected: { color: '#fff', fontWeight: '700' },
   registerButton: {
-    backgroundColor: "#6EEB83",
-    paddingVertical: 12,
-    borderRadius: 20,
-    alignItems: "center",
+    backgroundColor: '#2563EB',
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
     marginTop: 10,
-    width: "60%",
   },
-  registerText: {
-    color: "#000",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  backText: {
-    marginTop: 20,
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  registerText: { color: '#FFFFFF', fontWeight: '700', fontSize: 16 },
+  backText: { marginTop: 20, color: '#2563EB', fontWeight: '600', textAlign: 'center' },
 });

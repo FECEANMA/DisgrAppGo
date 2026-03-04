@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ImageBackground, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import ScreenWrapper from '../components/ScreenWrapper';
+import SettingsModal from '../components/SettingsModal';
 
 export default function GameLevelScreen() {
     const navigation: any = useNavigation();
@@ -21,12 +22,12 @@ export default function GameLevelScreen() {
 
             {/* Icono ajustes */}
             <TouchableOpacity style={styles.settings}>
-                <Text style={{ fontSize: 20 }}>⚙️</Text>
+                <SettingsModal/>
             </TouchableOpacity>
 
             <View style={styles.container}>
                 {/* Título */}
-                <Text style={styles.title}>Selecciona tu nivel</Text>
+                <Text style={styles.title}>Selecciona un nivel</Text>
 
                 {/* Botones de niveles */}
                 <TouchableOpacity style={[styles.button, styles.level1]} onPress={() => navigation.navigate('ChooseStudentLevelGame', { docenteDetail: docenteDetail, levelId: 1})}>

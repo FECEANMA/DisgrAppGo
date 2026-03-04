@@ -1,18 +1,21 @@
 //src/screens/GameScreen.tsx
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  ImageBackground
+  ImageBackground,
+  Animated,
+  ActivityIndicator
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { useBLE } from '../context/BLEContext';
 import { ResizeMode, Video } from 'expo-av';
+import SettingsModal from '../components/SettingsModal';
 
 export default function GameScreen() {
   const route = useRoute<any>();
@@ -26,6 +29,19 @@ export default function GameScreen() {
   const [seconds, setSeconds] = useState(0);
   const isPracticeLoaded = !!typePractice;
   const { device } = useBLE();
+  const [loading, setLoading] = useState(true); // <-- indica si los datos aún se cargan
+
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Para animación al mostrar el juego
+
+  useEffect(() => {
+    if (!loading) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading]);
 
   const sendToESP32 = async (text: string) => {
     if (!device) return;
@@ -59,6 +75,7 @@ export default function GameScreen() {
 
   useEffect(() => {
     const loadIdsAndFirstPractice = async () => {
+      setLoading(true);
       try {
         const endpoint =
           typeOrder.includes("word")
@@ -119,6 +136,8 @@ export default function GameScreen() {
       console.log(id, data)
     } catch (error) {
       console.error('Error fetching practice:', error);
+    } finally {
+      setLoading(false); // <-- Termina la animación de carga
     }
   };
 
@@ -186,7 +205,18 @@ export default function GameScreen() {
       : "Siguiente";
   };
 
+  if (loading) {
+    // Pantalla de carga animada
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={{ marginTop: 10, color: '#2563EB', fontWeight: 'bold' }}>Cargando práctica...</Text>
+      </View>
+    );
+  }
+
   return (
+    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
     <ImageBackground
       source={require('../../assets/login.png')}
       style={styles.background}
@@ -202,7 +232,7 @@ export default function GameScreen() {
 
       {/* ⚙️ Ajustes */}
       <TouchableOpacity style={styles.settings}>
-        <Text style={styles.icon}>⚙️</Text>
+        <SettingsModal/>
       </TouchableOpacity>
 
       <View style={styles.levelContainer}>
@@ -221,12 +251,6 @@ export default function GameScreen() {
         ) : (
           <MaterialIcons name="image" size={150} color="#ccc" />
         )}
-      </View>
-
-      <View style={styles.typeBadge}>
-        <Text style={styles.typeText}>
-          {typePractice?.caracter || typePractice?.texto || "Cargando"}
-        </Text>
       </View>
 
       {/* Video */}
@@ -268,9 +292,11 @@ export default function GameScreen() {
         </View>
       )}
     </ImageBackground>
+    </Animated.View>
   );
 }
 const styles = StyleSheet.create({
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F0F9FF' },
   background: {
     flex: 1,
     alignItems: 'center',

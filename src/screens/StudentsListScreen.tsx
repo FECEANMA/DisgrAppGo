@@ -5,7 +5,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
   TouchableOpacity,
   FlatList,
   Image,
@@ -16,7 +15,8 @@ import {
 import { API_BASE_URL } from "../config";
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons'; 
-import ScreenWrapper from '../components/ScreenWrapper';
+import LinearGradient from 'react-native-linear-gradient';
+import SettingsModal from '../components/SettingsModal';
 
 export default function StudentsListScreen() {
   const navigation: any = useNavigation();
@@ -93,22 +93,30 @@ export default function StudentsListScreen() {
   );
 
   return (
-    <ScreenWrapper>
-      <TouchableOpacity style={styles.home} onPress={() => navigation.goBack()}>
-        <Text style={{ fontSize: 24 }}>🏠</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.settings}>
-        <Text style={{ fontSize: 20 }}>⚙️</Text>
-      </TouchableOpacity>
+    <LinearGradient
+      colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={{ flex: 1 }}
+    >
+        {/* HEADER */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={{ fontSize: 24 }}>🏠</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>Alumnos</Text>
+          <SettingsModal/>
+        </View>
 
-      <View style={styles.container}>
+        {/* NUEVO ALUMNO */}
         <TouchableOpacity
-          onPress={() => navigation.navigate('AddStudents', {docenteDetail: docenteDetail})}
+          onPress={() => navigation.navigate('AddStudents', { docenteDetail })}
           style={styles.newButton}
         >
           <Text style={styles.newText}>+ Nuevo Alumno</Text>
         </TouchableOpacity>
 
+        {/* BUSCADOR */}
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar estudiante..."
@@ -116,14 +124,19 @@ export default function StudentsListScreen() {
           onChangeText={setSearchQuery}
         />
 
+        {/* LISTA DE ESTUDIANTES */}
         <FlatList
           data={filteredStudents}
           keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No se encontraron estudiantes.</Text>
+          }
           renderItem={({ item }) => (
             <View style={styles.card}>
               <TouchableOpacity 
                 onPress={() => navigation.navigate('ProfileStudent', { student: item })}
-                style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}
+                style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
               >
                 <Image 
                   source={item.imageUrl ? { uri: item.imageUrl } : require('../../assets/Niño1.png')} 
@@ -131,8 +144,7 @@ export default function StudentsListScreen() {
                 />
                 <View>
                   <Text style={styles.name}>{item.nombre} {item.apellido}</Text>
-                  <Text style={styles.text}>{item.edad} años</Text>
-                  <Text style={styles.text}>{item.aula.nombre}</Text>
+                  <Text style={styles.text}>{item.edad} años • {item.aula.nombre}</Text>
                 </View>
               </TouchableOpacity>
 
@@ -140,80 +152,93 @@ export default function StudentsListScreen() {
                 style={styles.deleteIcon}
                 onPress={() => confirmDelete(item)}
               >
-                <Ionicons name="trash" size={24} color="white" />
+                <Ionicons name="trash" size={22} color="#fff" />
               </TouchableOpacity>
             </View>
           )}
         />
-      </View>
-    </ScreenWrapper>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  home: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 1,
-  },
-  settings: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    zIndex: 1,
-  },
-  container: {
-    flex: 1,
-    paddingTop: 130,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 40,
     paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   newButton: {
-    backgroundColor: '#7CFF6B',
-    paddingVertical: 10,
-    borderRadius: 20,
+    backgroundColor: '#2563EB',
+    paddingVertical: 12,
+    borderRadius: 16,
     alignItems: 'center',
-    marginBottom: 20,
-    width: '60%',
-    alignSelf: 'center'
+    marginHorizontal: 20,
+    marginBottom: 15,
   },
   newText: {
-    fontWeight: 'bold',
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  searchInput: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginHorizontal: 20,
+    marginBottom: 15,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: '#E0E0E0',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 15,
+    marginHorizontal: 20,
     marginBottom: 15,
     alignItems: 'center',
     justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   avatar: {
     width: 60,
     height: 60,
+    borderRadius: 30,
     marginRight: 15,
   },
   name: {
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 16,
+    color: '#1E293B',
   },
   text: {
     fontSize: 14,
+    color: '#64748B',
   },
   deleteIcon: {
-    backgroundColor: '#FF4C4C',
+    backgroundColor: '#EF4444',
     padding: 8,
     borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  searchInput: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    marginBottom: 15,
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 50,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    color: '#64748B',
   },
 });

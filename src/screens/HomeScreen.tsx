@@ -4,9 +4,10 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
   Image,
   TouchableOpacity,
+  Alert,
+  ToastAndroid
 } from 'react-native';
 import { getDocente, removeDocente } from '../utils/session';
 import { BackHandler } from 'react-native';
@@ -15,7 +16,7 @@ import { useCallback } from 'react';
 import { BleManager } from 'react-native-ble-plx';
 import { PermissionsAndroid, Platform } from 'react-native';
 import { useBLE } from '../context/BLEContext';
-import ScreenWrapper from '../components/ScreenWrapper';
+import LinearGradient from 'react-native-linear-gradient';
 import SettingsModal from '../components/SettingsModal';
 
 export async function requestBluetoothPermissions() {
@@ -69,8 +70,20 @@ export default function HomeScreen() {
 
       const state = await manager.state();
       if (state !== 'PoweredOn') {
-        console.log('Bluetooth apagado');
         setIsScanning(false);
+
+        if (Platform.OS === 'android') {
+          ToastAndroid.show(
+            'Activa el Bluetooth para conectar el dispositivo',
+            ToastAndroid.LONG
+          );
+        } else {
+          Alert.alert(
+            'Bluetooth apagado',
+            'Activa el Bluetooth para conectar el dispositivo'
+          );
+        }
+
         return;
       }
 
@@ -164,88 +177,307 @@ export default function HomeScreen() {
   if (!docente) return null;
 
   return (
-    <ScreenWrapper>
-      {/* Icono ajustes */}
-      <TouchableOpacity style={styles.settings}>
-        <Text style={{ fontSize: 20 }}>⚙️</Text>
-      </TouchableOpacity>
+    <LinearGradient
+      colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={{ flex: 1 }}
+    >
+      <View style={styles.safeArea}>
 
-      <View style={styles.container}>
-        {/* Tarjeta profesor */}
+        {/* HEADER */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Panel del Docente</Text>
+          <SettingsModal/>
+        </View>
+
+        {/* TARJETA DOCENTE */}
         <View style={styles.card}>
           <Image
             source={require('../../assets/Profe.png')}
             style={styles.avatar}
           />
-          <Text style={styles.name}>{docente.nombre} {docente.apellido}</Text>
-          <Text style={styles.name}>{docente.aula.nombre}</Text>
+          <Text style={styles.name}>
+            {docente.nombre} {docente.apellido}
+          </Text>
+          <Text style={styles.aula}>
+            {docente.aula.nombre}
+          </Text>
         </View>
 
-        {/* Botones */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('Students', { docenteId: docente.id, docenteDetail: docente })}
-        >
-          <Text style={styles.buttonText}>Alumnos</Text>
-        </TouchableOpacity>
+        {/* SECCIÓN PRINCIPAL */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={() =>
+              navigation.navigate('Students', {
+                docenteId: docente.id,
+                docenteDetail: docente,
+              })
+            }
+          >
+            <Text style={styles.buttonTextPrimary}>Gestionar Alumnos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.secondaryButton,
+              !connected && styles.disabledButton,
+            ]}
+            disabled={!connected}
+            onPress={() =>
+              navigation.navigate('ChooseStudentGame', {
+                docenteDetail: docente,
+              })
+            }
+          >
+            <Text style={styles.buttonTextSecondary}>
+              Práctica Rápida
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.secondaryButton,
+              !connected && styles.disabledButton,
+            ]}
+            disabled={!connected}
+            onPress={() =>
+              navigation.navigate('GameLevel', {
+                docenteDetail: docente,
+              })
+            }
+          >
+            <Text style={styles.buttonTextSecondary}>
+              Niveles
+            </Text>
+          </TouchableOpacity>
+
+          {!connected && (
+            <Text style={styles.helperText}>
+              Conecta el dispositivo para iniciar actividades.
+            </Text>
+          )}
+        </View>
+
+        {/* SECCIÓN DISPOSITIVO */}
+        <View style={styles.deviceCard}>
+          <Text style={styles.deviceTitle}>Dispositivo del Aula</Text>
+
+          <View style={styles.statusRow}>
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: connected ? '#22C55E' : '#EF4444' },
+              ]}
+            />
+            <Text style={styles.statusText}>
+              {isScanning
+                ? 'Buscando dispositivo...'
+                : connected
+                ? 'Conectado'
+                : 'Desconectado'}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.connectButton}
+            onPress={handleDeviceToggle}
+            disabled={isScanning}
+          >
+            <Text style={styles.connectText}>
+              {connected ? 'Desconectar' : 'Conectar'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
-          style={[styles.button, !connected && styles.buttonDisabled]}
-          disabled={!connected}
-          onPress={() => navigation.navigate('ChooseStudentGame', { docenteDetail: docente })}
-        >
-          <Text style={styles.buttonText}>Práctica Rápida</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, !connected && styles.buttonDisabled]}
-          disabled={!connected}
-          onPress={() => navigation.navigate('GameLevel', { docenteDetail: docente })}
-        >
-          <Text style={styles.buttonText}>Niveles</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.disconnect,
-            { backgroundColor: connected ? '#4CAF50' : '#FF6B6B' },
-            isScanning && { opacity: 0.6 }
-          ]}
-          disabled={isScanning}
-          onPress={handleDeviceToggle} // 🔹 usamos toggle
-        >
-          <Text style={styles.disconnectText}>
-            {isScanning
-              ? 'Buscando dispositivo...'
-              : connected
-              ? 'Dispositivo Conectado'
-              : 'Conectar con Dispositivo'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.logoutButton]}
+          style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text style={styles.disconnectText}>Cerrar sesión</Text>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
-        <SettingsModal />
 
       </View>
-    </ScreenWrapper>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  settings: { position: 'absolute', top: 40, right: 20 },
-  container: { flex: 1, justifyContent: 'center', paddingHorizontal: 30 },
-  card: { backgroundColor: '#E0E0E0', borderRadius: 20, alignItems: 'center', padding: 20, marginBottom: 30 },
-  avatar: { width: 80, height: 80, marginBottom: 10 },
-  name: { fontWeight: 'bold' },
-  button: { backgroundColor: '#66E0E0', paddingVertical: 12, borderRadius: 20, alignItems: 'center', marginBottom: 15, width: '75%', alignSelf: 'center' },
-  buttonText: { fontWeight: 'bold' },
-  disconnect: { backgroundColor: '#FF6B6B', paddingVertical: 12, borderRadius: 20, alignItems: 'center', width: '60%', alignSelf: 'center' },
-  disconnectText: { color: '#fff', fontWeight: 'bold' },
-  buttonDisabled: { backgroundColor: '#B0B0B0', opacity: 0.6 },
-  logoutButton: { position: 'absolute', bottom: 30, alignSelf: 'center', backgroundColor: '#FF6B6B', paddingVertical: 12, borderRadius: 20, width: '60%', alignItems: 'center' },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 40,
+  },
+
+  /* HEADER */
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 25,
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+
+  settingsButton: {
+    padding: 6,
+  },
+
+  settingsIcon: {
+    fontSize: 20,
+    color: '#FFFFFF',
+  },
+
+  /* TARJETA DOCENTE */
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 25,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+
+  avatar: {
+    width: 80,
+    height: 80,
+    marginBottom: 12,
+  },
+
+  name: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#334155',
+  },
+
+  aula: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 4,
+  },
+
+  /* SECCIÓN */
+  section: {
+    marginBottom: 20,
+  },
+
+  /* BOTÓN PRINCIPAL */
+  primaryButton: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+
+  buttonTextPrimary: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  /* BOTONES SECUNDARIOS */
+  secondaryButton: {
+    backgroundColor: '#F1F5F9',
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+
+  buttonTextSecondary: {
+    color: '#1E293B',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+
+  disabledButton: {
+    opacity: 0.5,
+  },
+
+  helperText: {
+    fontSize: 13,
+    color: '#E2E8F0',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+
+  /* DISPOSITIVO */
+  deviceCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+
+  deviceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1E293B',
+    marginBottom: 10,
+  },
+
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+
+  statusText: {
+    fontSize: 14,
+    color: '#334155',
+  },
+
+  connectButton: {
+    backgroundColor: '#2563EB',
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+
+  connectText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+
+  /* FOOTER */
+  logoutButton: {
+    marginTop: 28,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 30,
+    backgroundColor: '#EF4444',
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+
+  logoutText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
 });

@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ImageBackground, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import ScreenWrapper from '../components/ScreenWrapper';
+import SettingsModal from '../components/SettingsModal';
 
 export default function TypeGameScreen() {
     const navigation: any = useNavigation();
@@ -22,7 +23,7 @@ export default function TypeGameScreen() {
 
             {/* Icono ajustes */}
             <TouchableOpacity style={styles.settings}>
-                <Text style={{ fontSize: 20 }}>⚙️</Text>
+                <SettingsModal/>
             </TouchableOpacity>
 
             <View style={styles.container}>

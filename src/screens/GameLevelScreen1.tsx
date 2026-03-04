@@ -1,18 +1,21 @@
 // src/screens/GameLevelScreen1.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Image,
-  ImageBackground
+  ImageBackground,
+  Animated,
+  ActivityIndicator
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { useBLE } from '../context/BLEContext';
 import { ResizeMode, Video } from 'expo-av';
+import SettingsModal from '../components/SettingsModal';
 
 export default function GameLevelScreen1() {
   const route = useRoute<any>();
@@ -25,9 +28,25 @@ export default function GameLevelScreen1() {
   const [currentId, setCurrentId] = useState<number | null>(null);
   const [started, setStarted] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [loading, setLoading] = useState(true); // <-- Nueva bandera de carga
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Para animación fade-in
+  const [wordIds, setWordIds] = useState<number[]>([]);
+  const [consonantIds, setConsonantIds] = useState<number[]>([]);
+  const [phase, setPhase] = useState<"words" | "consonants" | "vowels">("words");
+  const [vowelIds, setVowelIds] = useState<number[]>([]);
 
   const isPracticeLoaded = !!typePractice;
   const { device } = useBLE();
+
+  useEffect(() => {
+    if (!loading) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading]);
 
   // Enviar texto al ESP32
   const sendToESP32 = async (text: string) => {
@@ -60,42 +79,66 @@ export default function GameLevelScreen1() {
     }
   }, [typePractice]);
 
-  // Cargar IDs disponibles según levelId
-  useEffect(() => {
-    const loadIdsAndFirstPractice = async () => {
-      try {
-        let ids: number[] = [];
+// Cargar IDs disponibles según levelId
+useEffect(() => {
+  const loadIdsAndFirstPractice = async () => {
+    setLoading(true);
+    try {
+      let ids: number[] = [];
 
-        if (levelId === 1) {
-          // Nivel 1: solo letras (vocales)
-          const res = await fetch(`${API_BASE_URL}/practica/letras/ids`);
-          ids = await res.json();
-        } else if (levelId === 2) {
-          // Nivel 2: solo palabras
-          const res = await fetch(`${API_BASE_URL}/practica/palabras/ids`);
-          ids = await res.json();
-        } else if (levelId === 3) {
-          // Nivel 3: mezcla de letras y palabras
-          const resLetters = await fetch(`${API_BASE_URL}/practica/letras/ids`);
-          const resWords = await fetch(`${API_BASE_URL}/practica/palabras/ids`);
-          const letters: number[] = await resLetters.json();
-          const words: number[] = await resWords.json();
-          ids = [...letters, ...words].sort(() => Math.random() - 0.5);
-        }
-
+      if (levelId === 1) {
+        // Nivel 1: solo letras (vocales)
+        const res = await fetch(`${API_BASE_URL}/practica/letras/ids`);
+        ids = await res.json();
         setAvailableIds(ids);
+        setPhase("words"); // por compatibilidad
+      } 
+      else if (levelId === 2) {
+        // Nivel 2: palabras + consonantes separadas
+        const resWords = await fetch(`${API_BASE_URL}/practica/palabras/ids`);
+        const words: number[] = await resWords.json();
 
-        // Primer ID aleatorio
-        const firstId = ids[Math.floor(Math.random() * ids.length)];
-        setCurrentId(firstId);
-        setUsedIds([firstId]);
-      } catch (error) {
-        console.error("Error loading ids:", error);
+        const resConsonants = await fetch(`${API_BASE_URL}/practica/consonantes/ids`);
+        const consonants: number[] = await resConsonants.json();
+
+        setWordIds(words);
+        setConsonantIds(consonants);
+
+        ids = words; // empezamos con palabras
+        setPhase("words");
+        setAvailableIds(ids);
       }
-    };
+      else if (levelId === 3) {
+        // Nivel 3: palabras → consonantes → vocales
+        const resWords = await fetch(`${API_BASE_URL}/practica/palabras/ids`);
+        const words: number[] = await resWords.json();
 
-    loadIdsAndFirstPractice();
-  }, [levelId]);
+        const resConsonants = await fetch(`${API_BASE_URL}/practica/consonantes/ids`);
+        const consonants: number[] = await resConsonants.json();
+
+        const resVowels = await fetch(`${API_BASE_URL}/practica/letras/ids`);
+        const vowels: number[] = await resVowels.json();
+
+        setWordIds(words);
+        setConsonantIds(consonants);
+        setVowelIds(vowels);
+
+        ids = words; // empezamos con palabras
+        setPhase("words");
+        setAvailableIds(ids);
+      }
+
+      // Primer ID
+      const firstId = ids[0];
+      setCurrentId(firstId);
+      setUsedIds([firstId]);
+    } catch (error) {
+      console.error("Error loading ids:", error);
+    }
+  };
+
+  loadIdsAndFirstPractice();
+}, [levelId]);
 
   // Cargar práctica actual
   useEffect(() => {
@@ -122,13 +165,17 @@ export default function GameLevelScreen1() {
 
       if (levelId === 1) {
         endpoint = `/practica/letra/${id}`;
-      } else if (levelId === 2) {
-        endpoint = `/practica/palabra/${id}`;
-      } else if (levelId === 3) {
-        // Mezcla: verificar si el ID es letra o palabra
-        const resLetters = await fetch(`${API_BASE_URL}/practica/letras/ids`);
-        const letters: number[] = await resLetters.json();
-        endpoint = letters.includes(id) ? `/practica/letra/${id}` : `/practica/palabra/${id}`;
+      } 
+      else if (levelId === 2) {
+        if (phase === "words") {
+          endpoint = `/practica/palabra/${id}`;
+        } else {
+          endpoint = `/practica/letra/${id}`; // 👈 consonantes
+        }
+      }
+      else if (levelId === 3) {
+        if (phase === "words") endpoint = `/practica/palabra/${id}`;
+        else endpoint = `/practica/letra/${id}`; // consonantes o vocales
       }
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`);
@@ -137,6 +184,8 @@ export default function GameLevelScreen1() {
       console.log(id, data);
     } catch (error) {
       console.error('Error fetching practice:', error);
+    } finally {
+      setLoading(false); // <-- Termina la animación de carga
     }
   };
 
@@ -166,9 +215,34 @@ const handleStartNext = async () => {
   const remainingIds = availableIds.filter(id => !usedIds.includes(id));
 
   if (remainingIds.length === 0) {
-    // Al terminar todas las prácticas
-    await upPointPractice();      // suma la práctica
-    await upLevelProgress();      // suma progreso/nivel
+    if (levelId === 2) {
+      if (phase === "words") {
+        setPhase("consonants");
+        setAvailableIds(consonantIds);
+        setUsedIds([]);
+        setCurrentId(consonantIds[0]);
+        return;
+      }
+    } else if (levelId === 3) {
+      // Pasar a la siguiente fase
+      if (phase === "words") {
+        setPhase("consonants");
+        setAvailableIds(consonantIds);
+        setUsedIds([]);
+        setCurrentId(consonantIds[0]);
+        return;
+      } else if (phase === "consonants") {
+        setPhase("vowels");
+        setAvailableIds(vowelIds);
+        setUsedIds([]);
+        setCurrentId(vowelIds[0]);
+        return;
+      }
+    }
+
+    // Si ya terminó la última fase → terminar nivel
+    await upPointPractice();
+    await upLevelProgress();
     navigation.goBack();
     return;
   }
@@ -200,7 +274,18 @@ const handleStartNext = async () => {
     return usedIds.length === availableIds.length ? "Terminar Práctica" : "Siguiente";
   };
 
+  if (loading) {
+    // Pantalla de carga animada
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2563EB" />
+        <Text style={{ marginTop: 10, color: '#2563EB', fontWeight: 'bold' }}>Cargando práctica...</Text>
+      </View>
+    );
+  }
+
   return (
+    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
     <ImageBackground source={require('../../assets/login.png')} style={styles.background}>
       <View style={styles.blueOverlay} />
 
@@ -209,7 +294,7 @@ const handleStartNext = async () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.settings}>
-        <Text style={styles.icon}>⚙️</Text>
+        <SettingsModal/>
       </TouchableOpacity>
 
       <View style={styles.levelContainer}>
@@ -222,10 +307,6 @@ const handleStartNext = async () => {
         ) : (
           <MaterialIcons name="image" size={150} color="#ccc" />
         )}
-      </View>
-
-      <View style={styles.typeBadge}>
-        <Text style={styles.typeText}>{typePractice?.caracter || typePractice?.texto || "Cargando"}</Text>
       </View>
 
       {/* Video */}
@@ -259,10 +340,12 @@ const handleStartNext = async () => {
         </View>
       )}
     </ImageBackground>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F0F9FF' },
   background: { flex: 1, alignItems: 'center' },
   blueOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0, 80, 180, 0.25)" },
   home: { position: 'absolute', top: 40, left: 20, zIndex: 1 },

@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image,   ImageBackground,   TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { API_BASE_URL } from "../config";
-import ScreenWrapper from '../components/ScreenWrapper';
+import LinearGradient from 'react-native-linear-gradient';
+import SettingsModal from '../components/SettingsModal';
 
 export default function ProfileStudentScreen() {
   const route: any = useRoute();
@@ -28,77 +29,72 @@ export default function ProfileStudentScreen() {
   );
 
   return (
-    <ScreenWrapper>
-
-    {/* Botón Home */}
-    <TouchableOpacity
-      style={styles.home}
-      onPress={() => navigation.goBack()}
-    >
-      <Text style={{ fontSize: 24 }}>⬅️</Text>
-    </TouchableOpacity>
-
-    {/* Config */}
-    <TouchableOpacity style={styles.settings}>
-      <Text style={{ fontSize: 20 }}>⚙️</Text>
-    </TouchableOpacity>
-
-    <View style={styles.container}>
-      {/* Información del alumno */}
-      <View style={styles.profileCard}>
-      
-        <Image
-          source={ student.imageUrl ? { uri: student.imageUrl } : require('../../assets/Niño1.png')} 
-          style={styles.avatar}
-          resizeMode="cover"
-        />
-
-          <Text style={styles.name}>{student.nombre} {student.apellido}</Text>
-          <Text>{student.edad} años</Text>
-          <Text>{student.aula.nombre}</Text>
-      </View>
-      
-      {/* Botón Editar */}
-      <TouchableOpacity
-        style={styles.editButton}
-        onPress={() =>
-          navigation.navigate('EditStudentScreen', { student })
-        }
+      <LinearGradient
+        colors={['#2563EB', '#38BDF8', '#F8FAFC']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ flex: 1 }}
       >
-        <Text style={styles.editText}>✏️ Editar Estudiante</Text>
-      </TouchableOpacity>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
+            <Text style={{ fontSize: 20 }}>⬅️</Text>
+          </TouchableOpacity>
 
-      {/* Progreso */}
-      <View style={styles.progressCard}>
-        <Text style={styles.sectionTitle}>Progreso General</Text>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${student.progresoGeneral}%` }
-            ]}
-          />
+          <SettingsModal />
         </View>
 
-        <Text style={styles.percent}>{student.progresoGeneral}%</Text>
+        <View style={styles.container}>
+          {/* TARJETA DEL ESTUDIANTE */}
+          <View style={styles.profileCard}>
+            <Image
+              source={student.imageUrl ? { uri: student.imageUrl } : require('../../assets/Niño1.png')}
+              style={styles.avatar}
+              resizeMode="cover"
+            />
+            <Text style={styles.name}>{student.nombre} {student.apellido}</Text>
+            <Text style={styles.age}>{student.edad} años</Text>
+            <Text style={styles.aula}>{student.aula.nombre}</Text>
+          </View>
 
-        <Text style={styles.sectionTitle}>Total de Prácticas</Text>
-        <Text style={styles.value}>{student.totalPracticas}</Text>
+          {/* BOTÓN EDITAR */}
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditStudentScreen', { student })}
+          >
+            <Text style={styles.editText}>✏️ Editar Estudiante</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.sectionTitle}>Nivel Actual</Text>
-        <Text style={styles.value}>{student.nivelActual.nombre}</Text>
+          {/* PROGRESO */}
+          <View style={styles.progressCard}>
+            <Text style={styles.sectionTitle}>Progreso General</Text>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${student.progresoGeneral}%` }]} />
+            </View>
+            <Text style={styles.percent}>{student.progresoGeneral}%</Text>
 
-        <Text style={styles.sectionTitle}>Dificultades Detectadas</Text>
-        <View style={styles.difficultyBox}>
-          <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-            {student.observacion || 'Sin dificultades detectadas'}
-          </Text>
+            <View style={styles.statsRow}>
+              <View style={styles.statBox}>
+                <Text style={styles.statTitle}>Prácticas</Text>
+                <Text style={styles.statValue}>{student.totalPracticas}</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statTitle}>Nivel</Text>
+                <Text style={styles.statValue}>{student.nivelActual.nombre}</Text>
+              </View>
+            </View>
+
+            <Text style={styles.sectionTitle}>Dificultades Detectadas</Text>
+            <View style={styles.difficultyBox}>
+              <Text style={styles.difficultyText}>
+                {student.observacion || 'Sin dificultades detectadas'}
+              </Text>
+            </View>
+          </View>
         </View>
-      </View>
-    </View>
-  </ScreenWrapper>
+      </LinearGradient>
   );
 }
+
 const styles = StyleSheet.create({
   home: {
     position: 'absolute',
@@ -114,68 +110,127 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
-    paddingTop: 120
+    paddingHorizontal: 24,
+    paddingTop: 120,
   },
   profileCard: {
-    backgroundColor: '#D8CF9C',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     alignItems: 'center',
     padding: 20,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 12,
   },
   name: {
-    fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1E293B',
   },
-  progressCard: {
-    backgroundColor: '#E0E0E0',
-    borderRadius: 20,
-    padding: 20,
+  age: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 4,
   },
-  sectionTitle: {
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  value: {
-    fontSize: 18,
-    color: '#4CAF50',
-  },
-  progressBar: {
-    height: 12,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginVertical: 8,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-  },
-  percent: {
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  difficultyBox: {
-    backgroundColor: '#F25C5C',
-    borderRadius: 10,
-    marginTop: 8,
-    padding: 10,
+  aula: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 2,
   },
   editButton: {
-    backgroundColor: '#FFD966',
-    borderRadius: 15,
+    backgroundColor: '#2563EB',
+    borderRadius: 14,
     paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 20,
   },
   editText: {
-    fontWeight: 'bold',
+    color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  progressCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontWeight: '700',
+    fontSize: 16,
+    marginTop: 10,
+    marginBottom: 5,
+    color: '#1E293B',
+  },
+  progressBar: {
+    height: 12,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 10,
+    marginVertical: 8,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#2563EB',
+    borderRadius: 10,
+  },
+  percent: {
+    textAlign: 'center',
+    marginBottom: 12,
+    color: '#334155',
+    fontWeight: '600',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  statBox: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statTitle: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#2563EB',
+  },
+  difficultyBox: {
+    backgroundColor: '#F25C5C',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 6,
+  },
+  difficultyText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  header: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  headerButton: {
+    padding: 10,
   },
 });
