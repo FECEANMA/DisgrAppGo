@@ -335,8 +335,8 @@ const handleStartNext = async () => {
       </TouchableOpacity>
 
       {started && (
-        <View style={{ marginTop: 20 }}>
-          <Text style={{ color: '#fff', fontSize: 16 }}>⏱ Tiempo: {seconds}s</Text>
+        <View style={styles.timerContainer}>
+          <Text style={styles.timerText}>⏱ {seconds}s</Text>
         </View>
       )}
     </ImageBackground>
@@ -375,5 +375,23 @@ const styles = StyleSheet.create({
   video: {
     width: '100%',
     height: '100%',
+  },
+  timerContainer: {
+    marginTop: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)', // fondo semitransparente
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 50, // circular
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5, // para Android
+  },
+  timerText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
